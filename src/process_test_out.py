@@ -3,7 +3,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-n = 3
+
+n = 3 # number of electrodes
+delay = 10 #ms
+sampling_rate = 1000/delay #Hz
+
 def read_board_output():
     data = pd.read_csv('output.csv')
     tss = [[data[data['x']==i][data['y']==j] for i in range(n)] for j in range(n)]
@@ -38,7 +42,7 @@ def animate_pressuremap(maps):
         ax.clear()
         create_heatmap(maps[i], ax)
 
-    ani = animation.FuncAnimation(fig, animate, frames=len(maps), repeat=False, interval = 800)
+    ani = animation.FuncAnimation(fig, animate, frames=len(maps), repeat=False, interval = 1000/sampling_rate*8)
     cbar = fig.colorbar(animate(0), ax=ax, orientation='vertical')
     cbar.set_label('Voltage')
 

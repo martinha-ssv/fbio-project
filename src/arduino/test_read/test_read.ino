@@ -1,7 +1,7 @@
-const int n_vertical = 1;
-const int n_horizontal = 1;
-const int verticalPins[n_vertical] = {3}; // Digital pins for vertical strips
-const int horizontalPins[n_horizontal] = {A0}; // Analog pins for horizontal strips
+const int n_vertical = 3;
+const int n_horizontal = 3;
+const int verticalPins[n_vertical] = {2,3,4}; // Digital pins for vertical strips
+const int horizontalPins[n_horizontal] = {A0, A1, A2}; // Analog pins for horizontal strips
 const int V_IN = 5.0;
 
 const int vCoordsDisp[] = {0};
