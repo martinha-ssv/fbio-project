@@ -1,11 +1,14 @@
-const int n_vertical = 3;
-const int n_horizontal = 3;
-const int verticalPins[n_vertical] = {2, 3, 4}; // Digital pins for vertical strips
-const int horizontalPins[n_horizontal] = {A0, A1, A2}; // Analog pins for horizontal strips
+const int n_vertical = 1;
+const int n_horizontal = 1;
+const int verticalPins[n_vertical] = {3}; // Digital pins for vertical strips
+const int horizontalPins[n_horizontal] = {A0}; // Analog pins for horizontal strips
 const int V_IN = 5.0;
 
+const int vCoordsDisp[] = {0};
+const int hCoordsDisp[] = {1};
+
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   
   // Set vertical pins as outputs
   for (int i = 0; i < n_vertical; i++) {
@@ -34,18 +37,27 @@ void loop() {
 
       // Print the sensor value
       //Serial.print("x: ");
-      Serial.print(x);
-      Serial.print(",");
-      //Serial.print(", y: ");
-      Serial.print(y);
-      Serial.print(",");
-      //Serial.print(", voltage: ");
-      Serial.println(voltage);
+        Serial.print(x);
+        Serial.print(",");
+        //Serial.print(", y: ");
+        Serial.print(y);
+        Serial.print(",");
+        //Serial.print(", voltage: ");
+        Serial.println(voltage);
     }
 
     // Deactivate the vertical strip
     digitalWrite(verticalPins[x], LOW);
   }
 
-  delay(100);  // Small delay to make the output readable
+  delay(10);  // Small delay to make the output readable
+}
+
+bool isInArray(int arr[], int size, int value) {
+    for (int i = 0; i < size; ++i) {
+        if (arr[i] == value) {
+            return true;
+        }
+    }
+    return false;
 }

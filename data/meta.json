@@ -1,0 +1,92 @@
+{
+    "01": {
+        "mass": 463,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "02": {
+        "mass": 426,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "03": {
+        "mass": 385,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "04": {
+        "mass": 336,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "05": {
+        "mass": 288,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "06": {
+        "mass": 213,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "07": {
+        "mass": 186,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "08": {
+        "mass": 160,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "09": {
+        "mass": 106,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "10": {
+        "mass": 75,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "11": {
+        "mass": 46,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "12": {
+        "mass": 1558,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "13": {
+        "mass": 1436,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "14": {
+        "mass": 1200,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "15": {
+        "mass": 1074,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "16": {
+        "mass": 859,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "17": {
+        "mass": 745,
+        "prototype": "R",
+        "prototype_id": 1
+    },
+    "18": {
+        "mass": 627,
+        "prototype": "R",
+        "prototype_id": 1
+    }
+}
