@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from data import vmin, vmax, n
 import logging
-from anyplot import AnyPlot, MultipleTimeseries, Heatmap
+from anyplot import AnyPlot, MultipleTimeseries, HeatmapDots, Heatmap
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -25,7 +25,7 @@ class Display():
 
 
     def getPlotTypeFromUserInput(self):
-        plot_fs_str = '\n'.join([f"{i}: {plot.description}" for i, plot in enumerate(Display.PLOT_CLASSES)])
+        plot_fs_str = '\n'.join([f"[{i}]   {plot.description}" for i, plot in enumerate(Display.PLOT_CLASSES)])
         print(f"Available plot types are:\n{plot_fs_str}")
         
         plot_option = None

@@ -36,7 +36,7 @@ class Comms():
 
     def getPortFromInput(self):
         available_ports = serial.tools.list_ports.comports()
-        ports_str = '\n'.join([f"{i}: {port}" for i, port in enumerate(available_ports)])
+        ports_str = '\n'.join([f"[{i}]   {port}" for i, port in enumerate(available_ports)])
         print(f"Available ports are:\n{ports_str}")
         port = None
         while port is None:

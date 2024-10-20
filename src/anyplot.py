@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 from data import vmin, vmax, n
 import logging
+import numpy as np
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -33,6 +34,7 @@ class AnyPlot(ABC):
 
     @abstractmethod
     def config_axes(self):
+        self.ax.cla()
         pass
 
     def pause(self, interval):
@@ -51,13 +53,13 @@ class MultipleTimeseries(AnyPlot):
         logger.debug("Updating timeseries plot")
         for (x,y) in self.display.data.data:
             ax = self.ax[x, y]
-            ax.cla()
             self.config_ax(x,y)
             time, voltage = self.display.data.getTimeSeries(x, y, window=100)
             ax.plot(time, voltage)
 
     def config_ax(self, i, j):
         ax = self.ax[i, j]
+        ax.cla() # FIXME I changed this and unsure it is correct.
         ax.set_title(f'electrode {i}, {j}')
         ax.set_ylim([vmin, vmax])
 
@@ -65,10 +67,58 @@ class MultipleTimeseries(AnyPlot):
         for (x,y) in self.display.data.data:
             self.config_ax(x, y)
 
-class Heatmap(AnyPlot):
+class HeatmapDots(AnyPlot):
+    description = 'Show a heatmap as dots of the pressure on each electrode.'
+    def __init__(self, display):
+        super().__init__(display)
+        self.fig, self.ax = plt.subplots()
+        sc = plt.scatter([], [], c=[], s=100, cmap='gist_rainbow', edgecolors='black', vmin=vmin, vmax=vmax)
+        plt.colorbar(sc)
+
     def update_plot(self, data):
-        self.ax.bar(range(len(data)), data)
+        self.config_axes()
+        x_coords, y_coords, voltages = self.get_data()
+        plt.scatter(x_coords, y_coords, c=voltages, s=500, cmap='gist_rainbow', edgecolors='black', vmin=vmin, vmax=vmax)
+        plt.title('Pressure Distribution - Live Data')
+        plt.xlabel('Width')
+        plt.ylabel('Length')
+
+    def get_data(self):
+        x_coords = []
+        y_coords = []
+        voltages = []
+        for (x,y) in self.display.data.data:
+            x_coords.append(x)
+            y_coords.append(y)
+            _, voltages_in = self.display.data.getTimeSeries(x, y, window=10)
+            voltage = np.mean(voltages_in)
+            voltages.append(voltage)
+        return x_coords, y_coords, voltages
+    
+    def config_axes(self):
+        self.ax.cla()
+        
+class Heatmap(AnyPlot):
+    description = 'Show a heatmap of the pressure on each electrode.'
+    def __init__(self, display):
+        super().__init__(display)
+        self.fig, self.ax = plt.subplots()
+        sc = plt.imshow(np.zeros((n,n)), cmap='gist_rainbow', vmin=vmin, vmax=vmax)
+        plt.colorbar(sc)
+    
+    def update_plot(self, data):
+        self.config_axes()
+        heatmap_data = self.get_data()
+        plt.imshow(heatmap_data, cmap='gist_rainbow', vmin=vmin, vmax=vmax)
+        plt.title('Pressure Distribution - Live Data')
 
     def config_axes(self):
-        self.ax.set_xlabel('Categories')
-        self.ax.set_ylabel('Values')
+        return super().config_axes()
+
+    def get_data(self):
+        heatmap_data = np.zeros((n,n))
+        for (x,y) in self.display.data.data:
+            _, voltages_in = self.display.data.getTimeSeries(x, y, window=10)
+            voltage = np.mean(voltages_in)
+            heatmap_data[x, y] = voltage
+        return heatmap_data
