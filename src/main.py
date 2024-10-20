@@ -8,17 +8,18 @@ data = Data()
 comms = Comms(port, data)
 display = Display(data)
 
-reading = threading.Thread(name='SERIAL', target=comms.serialStream, daemon=False)
-#processing = threading.Thread(name='FILTER', target=data.processData, args=(data,), daemon=True)
-#displaying = threading.Thread(name='PLOT', target=display.display, args=(data,), daemon=True)
+plot_interval = 0.05
 
+reading = threading.Thread(name='SERIAL', target=comms.serialStream, daemon=False)
 reading.start()
+#processing = threading.Thread(name='FILTER', target=data.processData, args=(data,), daemon=True)
+display.display(plot_interval)
+
+
 #processing.start()
-#displaying.start()
 
 reading.join()
 #processing.join()
-#displaying.join()
 
 df = data.createFullData()
 df.to_csv('output.csv', index=False)

@@ -40,11 +40,8 @@ void loop(){
   nanoFarads = microFarads * 1000.0; 
   
   Serial.print(nanoFarads); Serial.println(" nF");
-  delay(500); 
-
-  
+  delay(100);
   digitalWrite(chargePin, LOW);            
-
   startDischargingTime = micros();
   while(analogRead(analogPin) > 0){   
     Serial.println("Discharging");   

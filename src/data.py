@@ -6,9 +6,10 @@ n = 3 # number of electrodes
 delay = 10 #ms
 sampling_rate = 1000/delay #Hz
 
+vmin = 0 #V
+vmax = 5 #V
+
 class Data():
-    vmin = 0
-    vmax = 5
 
     def __init__(self):
         self.full_data = pd.DataFrame(columns=['x', 'y', 'time', 'voltage'])
