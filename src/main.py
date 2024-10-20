@@ -5,7 +5,7 @@ from display import Display
 
 port = '/dev/cu.usbserial-AQ01PKSO'
 data = Data()
-comms = Comms(port, data)
+comms = Comms(data)
 display = Display(data)
 
 plot_interval = 0.05

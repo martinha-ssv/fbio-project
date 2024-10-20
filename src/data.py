@@ -1,6 +1,7 @@
 import time
 import pandas as pd
 import numpy as np
+import logging
 
 n = 3 # number of electrodes
 delay = 10 #ms
@@ -8,6 +9,9 @@ sampling_rate = 1000/delay #Hz
 
 vmin = 0 #V
 vmax = 5 #V
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()
 
 class Data():
 
@@ -19,12 +23,15 @@ class Data():
         self.startTime = time.perf_counter()
 
     def add(self, line):
-            line_dict = self.parseLine(line)
-            self.addDataLine(line_dict)
-
+            try:
+                line_dict = self.parseLine(line)
+                self.addDataLine(line_dict)
+            except:
+                logger.error(f"Failed to parse line: {line}")
+    
     def getTimeSeries(self, x, y, window=None):
         window = len(self.data[(x,y)]['time']) if window is None else window
-        return self.data[(x,y)]['time'][window:], self.data[(x,y)]['voltage'][window:]
+        return self.data[(x,y)]['time'][-window:], self.data[(x,y)]['voltage'][-window:]
     
     def parseLine(self, line):
         line = line.split(',')
@@ -55,3 +62,8 @@ class Data():
         grouped_df = self.full_data.groupby(['x', 'y'])
         for (x, y), group in grouped_df:
             print(group) #TODO
+
+    def saveData(self):
+        self.createFullData()
+        self.full_data.to_csv('output.csv', index=False)
+        logger.info("Data saved to output.csv")
