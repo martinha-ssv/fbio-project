@@ -21,4 +21,4 @@ def read_board_data(seconds, live=False):
         #if live:
 
 
-#read_board_data(20)
+#read_board_data(5)
