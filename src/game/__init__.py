@@ -1,100 +1,126 @@
 import pygame
-import math
+import numpy as np
+import time
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# PHYSICAL CONSTANTS
+g = 9.81  # Gravity (m/s^2)
+R = 1   # Half the length of the bar in (m)
+wL = 2.0  # Left weight (kg)
+wR = 5.0  # Right weight (kg)
+m_bar = 10.0  # Weight of the bar itself (kg)
+damping = 0.01    # Damping factor
+h = 1 # Vertical distance from the center of mass to the pivot point (m)
+bar_length = R * 2  # Full length of the bar (m)
+
+    ## Moment of inertia (including the bar's weight)
+I_bar = (1/3) * m_bar * R**2 + m_bar * h**2
+I_weights = (wL + wR) * (R**2 + h**2)
+I_total = I_bar + I_weights
+
+
+# GEOMETRY
+px_m = 200  # Pixels per meter
+pivot_point = (400, 300)  # Pivot point of the bar (pixels)
+bar_center_start = (pivot_point[0] - R * px_m, pivot_point[1] + h * px_m)  # Center of the bar at the start (pixels)
+bar_length_px = bar_length * px_m  # Full length of the bar (pixels)
+bar_thickness = 0.05 * px_m  # Thickness of the bar (for drawing)
+
+
+# INITIAL CONDITIONS
+theta = 0.0  # Initial angle (horizontal, 0 radians)
+omega = 0.0  # Initial angular velocity
+alpha = 0.0  # Initial angular acceleration
+    ## Force applied by player TODO -> change this to depend on sensor signal (in loop below)
+r_force = 0.5  # Distance from the pivot point to the force application point (m)
+
+
+
+
+
+def rotate_around_point(window, surf, theta, pivot):
+    last_coords = np.array(surf.get_rect().center)
+    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    r_pivot = last_coords - pivot
+    rotated_rpivot = rotation_matrix @ (r_pivot)
+    new_coords = pivot + rotated_rpivot
+    return new_coords, pygame.transform.rotate(surf, np.degrees(theta))
 
 def run_game():
-    # Initialize pygame
+    # Initialize Pygame
     pygame.init()
 
-    # Define constants
-    WIDTH, HEIGHT = 800, 600
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    BAR_WIDTH, BAR_HEIGHT = 200, 20  # Dimensions of the bar
-    STEEL_DENSITY = 7850  # kg/m^3 (Density of steel)
-    G = 9.81  # Gravitational constant
-    DAMPING = 0.99  # Damping factor to simulate friction
+    # Window size and setup
+    width, height = 800, 600
+    window = pygame.display.set_mode((width, height))
+    pygame.display.set_caption("Weightlifer Simulation")
 
-    # Define the physics
-    bar_mass = STEEL_DENSITY * BAR_WIDTH * BAR_HEIGHT * 1e-6  # mass in kg (assuming 1m length scale)
-    moment_of_inertia = (1 / 12) * bar_mass * (BAR_WIDTH ** 2)  # Moment of inertia of a rectangle
 
-    # Angular acceleration and velocity
-    angular_velocity = 0
-    angular_acceleration = 0
-    gravity_acceleration = G / 1000  # Adjust gravity effect for visual scale
+    # Bar surface
+    bar_surface = pygame.Surface((bar_length, bar_thickness), pygame.SRCALPHA)
+    bar_surface.fill(WHITE)
+    window_center = np.array([width // 2, height // 2])
+    window.blit(bar_surface, window_center)
 
-    # Axis of rotation (can be anywhere on the screen)
-    AXIS_X = WIDTH // 2
-    AXIS_Y = HEIGHT // 3
-
-    # Setup display
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Rotating Bar with External Axis")
-
-    # Clock to control frame rate
+    # Simulation loop control
+    running = True
     clock = pygame.time.Clock()
 
-    def draw_rotating_bar(surface, angle, width, height, axis_x, axis_y):
-        """Draw the rectangular bar with a given rotation angle, maintaining its dimensions, rotating around the external axis."""
-        bar = pygame.Surface((width, height), pygame.SRCALPHA)  # Allow transparency
-        bar.fill(BLACK)
-        
-        # Rotate the bar around its center
-        rotated_bar = pygame.transform.rotate(bar, angle)
-        
-        # Get the new rectangle position (but do not center it on screen, instead use axis as rotation point)
-        rect = rotated_bar.get_rect(center=(axis_x, axis_y))
-        
-        # Blit the rotated bar to the surface
-        surface.blit(rotated_bar, rect)
-
     # Main game loop
-    running = True
-    angle = 0  # Starting angle of rotation (0 means horizontal)
+    last_time = time.time()
 
     while running:
+        # Handle events (like quitting)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Input handling
+        # Get the state of all keys
         keys = pygame.key.get_pressed()
 
+        applied_force = 0
+        # Apply force based on key presses (A/D keys)
+        if keys[pygame.K_a]:
+            # Apply force in counterclockwise direction (negative torque)
+            applied_force = 100
         if keys[pygame.K_d]:
-            # Increase angular acceleration
-            angular_acceleration += 0.01
-        elif keys[pygame.K_a]:
-            # Decrease angular acceleration
-            angular_acceleration -= 0.01
-        else:
-            # Apply gravitational torque when no input is given
-            gravity_torque = -gravity_acceleration * math.sin(math.radians(angle))
-            angular_acceleration = gravity_torque / moment_of_inertia
+            # Apply force in clockwise direction (positive torque)
+            applied_force = -100
 
-        # Update the angular velocity and angle
-        angular_velocity += angular_acceleration
-        angular_velocity *= DAMPING  # Apply damping to simulate friction/air resistance
-        angle += angular_velocity
+        # Calculate net torque due to gravity (only weights contribute to torque)
+        tau_net = (wL - wR) * g * R
+    
+        # Add the torque from the perpendicular force
+        tau_perpendicular = applied_force * r_force
+        tau_total = tau_net + tau_perpendicular
+        
+        # Update angular acceleration
+        alpha = tau_total / I_total
+        
+        dt = time.time() - last_time # Time step
+        last_time = time.time()
+        # Update angular velocity
+        omega += alpha * dt
+        
+        # Update angle
+        theta += omega * dt
 
-        # Keep the angle within the range of -180 to 180 degrees for easier control
-        if angle > 180:
-            angle -= 360
-        elif angle < -180:
-            angle += 360
+        # Clear the screen
+        window.fill(BLACK)
 
-        # Screen update
-        screen.fill(WHITE)
+        # Rotate the bar and draw it
+        rotated_rect, rotated_bar = rotate_around_point(window, bar_surface, theta, pivot_point)
         
-        # Draw the axis point for reference
-        pygame.draw.circle(screen, BLACK, (AXIS_X, AXIS_Y), 5)
-        
-        # Draw the rotating bar around the external axis
-        draw_rotating_bar(screen, angle, BAR_WIDTH, BAR_HEIGHT, AXIS_X, AXIS_Y)
-        
+        # Get the rectangle of the rotated bar and set its center to the pivot point
+        window.blit(rotated_bar, rotated_rect)
+
+        # Update the display
         pygame.display.flip()
 
-        # Control the frame rate
+        # Cap the frame rate
         clock.tick(60)
 
-    # Quit pygame
+    # Quit Pygame
     pygame.quit()

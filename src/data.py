@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import logging
 
+# TODO DAC -> convert voltage to pressure based on the tuning curve inside testing
+
 n = 3 # number of electrodes
 delay = 10 #ms
 sampling_rate = 1000/delay #Hz
