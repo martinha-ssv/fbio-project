@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
 class Display():
-    PLOT_CLASSES = [MultipleTimeseries, Heatmap]
+    PLOT_CLASSES = [MultipleTimeseries, Heatmap, HeatmapDots]
     UPDATE_INTERVAL = 0.5
 
     def __init__(self, data):

@@ -3,12 +3,12 @@ from comms import Comms
 from data import Data
 from display import Display
 import logging
-import game
+#from game.game import Game
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
-plot_interval = 0.05
+plot_interval = 0.02
 port = '/dev/cu.usbserial-AQ01PKSO'
 data = Data()
 comms = Comms(data)
@@ -22,14 +22,16 @@ while runtime_opt is None:
     except:
         logger.info("Invalid option. Options are:\n{runtime_options_str}")
 
-reading = threading.Thread(name='SERIAL', target=comms.serialStream, daemon=False)
+reading = threading.Thread(name='SERIAL', target=comms.serialStream, daemon=True)
 reading.start()
 
 if runtime_opt == 0:
     display = Display(data)
     display.display(plot_interval)
 elif runtime_opt == 1:
-    game.run_game()
+    #game = Game()#data)
+    #game.run()
+    pass
 
 
 
