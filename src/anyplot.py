@@ -56,14 +56,16 @@ class MultipleTimeseries(AnyPlot):
             self.config_ax(x,y)
             time, voltage = self.display.data.getTimeSeries(x, y, window=100)
             ax.plot(time, voltage)
+            #plt.tight_layout()
 
     def config_ax(self, i, j):
         ax = self.ax[i, j]
         ax.cla() # FIXME I changed this and unsure it is correct.
-        ax.set_title(f'electrode {i}, {j}')
+        ax.set_title(f'Electrode {i}, {j}')
         ax.set_ylim([vmin, vmax])
 
     def config_axes(self):
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.5)
         for (x,y) in self.display.data.data:
             self.config_ax(x, y)
 

@@ -28,6 +28,11 @@ class Player():
         Player.players.append(self)
 
         # PHYSICAL CONSTANTS
+        self.phys = {
+            'LW': 1.0, # Left weight (kg)
+            'RW': 1.0, # Right weight (kg)
+            
+        }
         
 
     def getPlayerByName(name):
